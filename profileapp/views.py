@@ -150,6 +150,7 @@ class deleteComment(APIView):
                 return JsonResponse({"Response":"Comment not found"})
             if comment.user == user:
                 comment.delete()
+                comment.post.comment_count -= 1
                 return Response({"Response":"Comment Deleted"})
             else:
                 return Response({"Response":"You are not authorized to delete this comment"})
