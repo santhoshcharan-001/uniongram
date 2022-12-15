@@ -165,7 +165,7 @@ class user_posts(APIView):
     def get(self,request):
         user = User.objects.get(username=request.user.username)
         dic={}
-        postes = posts.objects.filter(user=user).order_by('-time_stamp', '-id')
+        postes = posts.objects.filter(user=user).order_by('datetime__hour', 'datetime__minute')
         for post in postes:
             commentes=[]
             comms = comments.objects.filter(post=post, user=user)
