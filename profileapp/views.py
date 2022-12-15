@@ -25,10 +25,10 @@ class PostViewSet(viewsets.ModelViewSet):
             if serializer.is_valid():
                 serializer.validated_data["user"] = request.user
                 serializer.save()
-                return Response("ok")
+                return Response("Post created")
         except:
             return Response("Error creating the post")
-            
+
 class addLike(APIView):
     permission_classes = [IsAuthenticated]
     def post(self,request,post_id):
@@ -78,6 +78,8 @@ class follow(APIView):
         if follow_user is None:
             return JsonResponse({"Response":"User you want to follow not found"})
         user = User.objects.get(username=request.user.username)
+        if user == follow_user:
+            return JsonResponse({"Response":"You can't follow yourself"})
         f=follows.objects.filter(followee=follow_user,follower=user)
         if len(f) == 0:
             follow = follows.objects.create(followee=follow_user, follower=user,time_stamp=datetime.now())
