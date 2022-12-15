@@ -26,7 +26,7 @@ class PostViewSet(viewsets.ModelViewSet):
                 serializer.validated_data["user"] = request.user
                 serializer.save()
                 # Post-ID, Title, Description, Created Time(UTC)
-                return Response({"Post-ID":serializer.data["id"],"Title":serializer.data["title"],"Description":serializer.data["content"],"Created Time(UTC)":serializer.data["time_stamp"]})
+                return Response({"Response":{"Post-ID":serializer.data["id"],"Title":serializer.data["title"],"Description":serializer.data["content"],"Created Time(UTC)":serializer.data["time_stamp"]}})
         except:
             return Response("Error creating the post")
 
