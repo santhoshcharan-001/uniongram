@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth.models import User
-
+from rest_framework import status
 # Create your views here.
 from .models import posts,comments,likes,follows
 
@@ -31,6 +31,25 @@ class PostViewSet(viewsets.ModelViewSet):
         except:
             return Response("Error creating the post")
 
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.user != request.user:
+            return Response("You are not authorized to delete this post")
+        # print(instance.user)
+        self.perform_destroy(instance)
+        return JsonResponse({"Response":"Post deleted successfully"})
+
+    def perform_destroy(self, instance):
+        instance.delete()
+
+    def list(self, request, *args, **kwargs):
+        try:
+            postes= posts.objects.filter(user=request.user)
+            serializer = postSerializer(postes, many=True)
+            return Response(serializer.data)
+        except:
+            return Response("Error listing the posts")
+            
 class addLike(APIView):
     permission_classes = [IsAuthenticated]
     def post(self,request,post_id):
