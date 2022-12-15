@@ -125,32 +125,36 @@ class user_details(APIView):
 class addComment(APIView):
     permission_classes = [IsAuthenticated]
     def post(self,request,post_id):
-        user = User.objects.get(username=request.user.username)
-        post = posts.objects.get(id=post_id)
-        if post is None:
-            return JsonResponse({"Response":"Post not found"})
-        post.comment_count += 1
-        post.save()
-        comment = comments.objects.create(post=post, user=user,content=request.data["comment"],time_stamp=datetime.now())
-        comment.save()
-        return Response({"Response":"Commented","Comment-id":comment.id})
-
+        try:
+            user = User.objects.get(username=request.user.username)
+            post = posts.objects.get(id=post_id)
+            if post is None:
+                return JsonResponse({"Response":"Post not found"})
+            post.comment_count += 1
+            post.save()
+            comment = comments.objects.create(post=post, user=user,content=request.data["comment"],time_stamp=datetime.now())
+            comment.save()
+            return Response({"Response":"Commented","Comment-id":comment.id})
+        except:
+            return Response("Error creating the comment")
     def get(self,request,post_id):
         return JsonResponse({"Response":"Get type is not allowed"})
 
 class deleteComment(APIView):
     permission_classes = [IsAuthenticated]
     def post(self,request,comment_id):
-        user = User.objects.get(username=request.user.username)
-        comment = comments.objects.get(id=comment_id)
-        if comment is None:
-            return JsonResponse({"Response":"Comment not found"})
-        if comment.user == user:
-            comment.delete()
-            return Response({"Response":"Comment Deleted"})
-        else:
-            return Response({"Response":"You are not authorized to delete this comment"})
-
+        try:
+            user = User.objects.get(username=request.user.username)
+            comment = comments.objects.get(id=comment_id)
+            if comment is None:
+                return JsonResponse({"Response":"Comment not found"})
+            if comment.user == user:
+                comment.delete()
+                return Response({"Response":"Comment Deleted"})
+            else:
+                return Response({"Response":"You are not authorized to delete this comment"})
+        except:
+            return Response("Error deleting the comment")
     def get(self,request,comment_id):
         return JsonResponse({"Response":"Get type is not allowed"})
 
