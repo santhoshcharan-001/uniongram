@@ -142,7 +142,7 @@ class addComment(APIView):
 
 class deleteComment(APIView):
     permission_classes = [IsAuthenticated]
-    def post(self,request,comment_id):
+    def delete(self,request,comment_id):
         try:
             user = User.objects.get(username=request.user.username)
             comment = comments.objects.get(id=comment_id)
