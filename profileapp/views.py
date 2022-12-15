@@ -151,6 +151,7 @@ class deleteComment(APIView):
             if comment.user == user:
                 comment.delete()
                 comment.post.comment_count -= 1
+                comment.post.save()
                 return Response({"Response":"Comment Deleted"})
             else:
                 return Response({"Response":"You are not authorized to delete this comment"})
