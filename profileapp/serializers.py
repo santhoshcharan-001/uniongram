@@ -11,7 +11,7 @@ class userSerializer(serializers.Serializer):
 class postSerializer(serializers.ModelSerializer):
     class Meta:
         model = posts
-        fields = ['user','title','content','time_stamp','like_count','comment_count']
+        fields = ['id','user','title','content','time_stamp','like_count','comment_count']
         read_only_fields = ['user','time_stamp','like_count','comment_count']
 
 # class likeSerializer(serializers.ModelSerializer):
