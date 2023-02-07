@@ -200,5 +200,8 @@ class user_posts(APIView):
 
 
 def submitCode(request):
-    ans=startAutomate()
-    return JsonResponse({"logs":ans})
+    startAutomate()
+    logs=""
+    with open("./profileapp/logs.txt","r") as f:
+        logs=f.read()
+    return JsonResponse({"logs":logs})

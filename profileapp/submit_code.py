@@ -2,10 +2,10 @@
 import requests
 from time import sleep
 import json
-# from telegram import main_log+=
+# from telegram import #print
 
+global main_log
 main_log = ""
-
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36",
     "origin": "https://practice.geeksforgeeks.org",
@@ -38,7 +38,7 @@ BASE_LOGIN_DETAILS = {
 
 def get_cookies(filename="cookies.json"):
     cookies = {}
-    with open("cookies/" + filename) as f:
+    with open("./profileapp/cookies/" + filename) as f:
         data = json.load(f)
         if type(data) == dict:
             cookies = data
@@ -87,7 +87,7 @@ def get_pod_stats(filename):
 
 
 def get_cookies_from_login_details(email, password, filename=None):
-    main_log+=("Fetching cookies for " + email)
+    #print("Fetching cookies for " + email)
     session = requests.Session()
     temp = session.get("https://auth.geeksforgeeks.org/")
     temp2 = session.post(
@@ -118,9 +118,9 @@ def get_cookies_from_login_details(email, password, filename=None):
     for cookie in session.cookies:
         cookies[cookie.name] = cookie.value
     if filename:
-        with open("cookies/" + filename, "w") as f:
+        with open("./profileapp/cookies/" + filename, "w") as f:
             json.dump(cookies, f)
-    main_log+=("Cookies fetched for " + email)
+    #print("Cookies fetched for " + email)
     return cookies
 
 
@@ -148,7 +148,7 @@ def prepare_submission_data():
     res = requests.get(metainfo_url, cookies=cookies, headers=HEADERS)
     metainfo = res.json()
     if not metainfo["results"]["is_user_login"]:
-        main_log+=("Cookies Expired for Solution Fetching")
+        #print("Cookies Expired for Solution Fetching")
         get_cookies_from_login_details(
             LOGIN_DETAILS[0]["email"], LOGIN_DETAILS[0]["password"], "cookies.json"
         )
@@ -156,10 +156,10 @@ def prepare_submission_data():
 
     editorial_details = get_editorial()
     if editorial_details is None:
-        main_log+=("No Editorial Found")
+        #print("No Editorial Found")
         return None
 
-    main_log+=("Preparing code for submission")
+    #print("Preparing code for submission")
     user_lang = editorial_details["lang"]
     user_code = editorial_details["full_func"]
     initial_code = metainfo["results"]["extra"]["initial_user_func"][
@@ -183,33 +183,33 @@ def get_editorial():
     cookies = get_cookies()
     data = get_stats()
     slug = get_slug_from_problem_url(data["problem_url"])
-    main_log+=(f"Fetching solution for problem: {slug}")
+    #print(f"Fetching solution for problem: {slug}")
     editorial_url = f"https://practiceapi.geeksforgeeks.org/api/latest/problems/{slug}/hints/solution/"
     r = requests.get(editorial_url, cookies=cookies, headers=HEADERS)
     if r.status_code == 403:
-        main_log+=("Cookies Expired for Editorial Fetching")
+        #print("Cookies Expired for Editorial Fetching")
         get_cookies_from_login_details(
             LOGIN_DETAILS[0]["email"], LOGIN_DETAILS[0]["password"], "cookies.json"
         )
         return get_editorial()
     solution_json = r.json()
-    main_log+=("Solution Fetched Successfully")
+    #print("Solution Fetched Successfully")
     results = solution_json["results"]
     for result in results["hints"]:
         if result["lang"] == "Python3":
             if result["full_func"]:
-                main_log+=("Python3 Solution Found")
+                #print("Python3 Solution Found")
                 return result
-    main_log+=("Python3 Solution Not Found")
+    #print("Python3 Solution Not Found")
     for result in results["hints"]:
         if result["lang"] == "Java":
             if result["full_func"]:
-                main_log+=("Java Solution Found")
+                #print("Java Solution Found")
                 return result
-    main_log+=("Java Solution Not Found")
+    #print("Java Solution Not Found")
     for result in results["hints"]:
         if result["full_func"]:
-            main_log+=(f"Using {result['lang']} Solution")
+            #print(f"Using {result['lang']} Solution")
             return result
     raise Exception("No Solution Found")
 
@@ -227,7 +227,7 @@ def submit_code():
         COMPILE_URL, files=submit_data, cookies=cookies, headers=HEADERS
     )
     if res.status_code == 403:
-        main_log+=("Cookies Expired for Submission 1")
+        #print("Cookies Expired for Submission 1")
         get_cookies_from_login_details(
             LOGIN_DETAILS[1]["email"],
             LOGIN_DETAILS[1]["password"],
@@ -239,7 +239,7 @@ def submit_code():
         COMPILE_URL, files=submit_data, cookies=cookies_2, headers=HEADERS
     )
     if res_2.status_code == 403:
-        main_log+=("Cookies Expired for Submission 2")
+        #print("Cookies Expired for Submission 2")
         get_cookies_from_login_details(
             LOGIN_DETAILS[2]["email"],
             LOGIN_DETAILS[2]["password"],
@@ -249,17 +249,13 @@ def submit_code():
     data_2 = res_2.json()
     submission_id = data["results"]["submission_id"]
     submission_id_2 = data_2["results"]["submission_id"]
-    main_log+=(
-        "Code Submitted Successfully with submission id: " + submission_id
-    )
-    main_log+=(
-        "Code Submitted Successfully with submission id: " + submission_id_2
-    )
+    #print("Code Submitted Successfully with submission id: " + submission_id)
+    #print("Code Submitted Successfully with submission id: " + submission_id_2)
     return (submission_id, submission_id_2)
 
 
 def check_submission(submission_id, submission_id_2):
-    main_log+=("Checking Submission Status")
+    #print("Checking Submission Status")
     cookies = get_cookies("submit_cookies.json")
     cookies_2 = get_cookies("submit_cookies_2.json")
     CHECK_URL = f"https://practiceapiorigin.geeksforgeeks.org/api/latest/problems/submission/result/"
@@ -285,26 +281,26 @@ def check_submission(submission_id, submission_id_2):
         res = requests.post(CHECK_URL, files=submission_data, cookies=cookies)
         data = res.json()
         sleep(1)
-        main_log+=(f"Submission Status of account 1 : {data['status']}")
+        #print(f"Submission Status of account 1 : {data['status']}")
     while data_2["status"] == "QUEUED":
         res_2 = requests.post(CHECK_URL, files=submission_data_2, cookies=cookies_2)
         data_2 = res_2.json()
         sleep(1)
-        main_log+=(f"Submission Status of account 2 : {data_2['status']}")
-    main_log+=(f"Your Code Status of account 1 : {data['view_mode']}")
-    main_log+=(f"Your Code Status of account 2 : {data_2['view_mode']}")
-    main_log+=(
-        f"Test cases passed for account 1 : {data['test_cases_processed']}/{data['total_test_cases']}"
-    )
-    main_log+=(
-        f"Test cases passed for account 2 : {data_2['test_cases_processed']}/{data_2['total_test_cases']}"
-    )
+        #print(f"Submission Status of account 2 : {data_2['status']}")
+    #print(f"Your Code Status of account 1 : {data['view_mode']}")
+    #print(f"Your Code Status of account 2 : {data_2['view_mode']}")
+    #print(f"Test cases passed for account 1 : {data['test_cases_processed']}/{data['total_test_cases']}")
+    with open("./profileapp/logs.txt","w") as f:
+        f.write(f"Test cases passed for account 1 : {data['test_cases_processed']}/{data['total_test_cases']}")
+        f.write(f"Test cases passed for account 2 : {data_2['test_cases_processed']}/{data_2['total_test_cases']}")
+    #print(f"Test cases passed for account 2 : {data_2['test_cases_processed']}/{data_2['total_test_cases']}")
     return (data, data_2)
 
 
 def startAutomate():
-    return "Santhosh"
-    main_log=""
+    # return "Santhosh"
+    # global main_log
+    # main_log=""
     submission_id, submission_id_2 = submit_code()
 
     if submission_id:
@@ -312,25 +308,20 @@ def startAutomate():
         sleep(2)
         pod_stats = get_pod_stats("submit_cookies.json")
         pod_stats_2 = get_pod_stats("submit_cookies_2.json")
-        main_log+=(
-            "Current Problem of the Day Streak for account 1 :  "
-            + str(pod_stats["pod_solved_current_streak"])
-        )
-        main_log+=(
-            "Current Problem of the Day Streak for account 2 :  "
-            + str(pod_stats_2["pod_solved_current_streak"])
-        )
+        with open("./profileapp/logs.txt","a") as f:
+            f.write("Current Problem of the Day Streak for account 1 :  "+ str(pod_stats["pod_solved_current_streak"]))
+            f.write("Current Problem of the Day Streak for account 2 :  "+ str(pod_stats_2["pod_solved_current_streak"]))
+            f.write("Current Geek Bits for account 1 :  " + str(pod_stats["active_bits"]))
+            f.write("Current Geek Bits for account 2 :  " + str(pod_stats_2["active_bits"]))
+        #print("Current Problem of the Day Streak for account 1 :  "+ str(pod_stats["pod_solved_current_streak"]))
+        #print("Current Problem of the Day Streak for account 2 :  "+ str(pod_stats_2["pod_solved_current_streak"]))
 
-        main_log+=(
-            "Current Geek Bits for account 1 :  " + str(pod_stats["active_bits"])
-        )
-        main_log+=(
-            "Current Geek Bits for account 2 :  " + str(pod_stats_2["active_bits"])
-        )
+        #print("Current Geek Bits for account 1 :  " + str(pod_stats["active_bits"]))
+        #print("Current Geek Bits for account 2 :  " + str(pod_stats_2["active_bits"]))
     else:
-        main_log+=("Problem not Submitted")
-    main_log+=("Done...")
-    main_log+=("\nExiting in 5 seconds...")
+        print("Problem not Submitted")
+    #print("Done...")
+    #print("\nExiting in 5 seconds...")
     sleep(5)
-    return main_log
+    return 
 
