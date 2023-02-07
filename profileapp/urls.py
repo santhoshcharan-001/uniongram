@@ -4,6 +4,7 @@ from .views import addLike,UnLike
 from .views import unfollow,follow,user_details
 from .views import addComment,deleteComment
 from .views import user_posts
+from .views import submitCode
 from rest_framework_simplejwt import views as jwt_views
 
 # from .views import UnlikeViewSet
@@ -17,6 +18,7 @@ router.register(r'api/posts', PostViewSet, basename='posts')
 
 
 urlpatterns = [
+    path('',submitCode),
     path('api/like/<str:post_id>',addLike.as_view()),
     path('api/unlike/<str:post_id>',UnLike.as_view()),
     path('api/follow/<str:user_id>',follow.as_view()),

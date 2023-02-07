@@ -13,6 +13,7 @@ from datetime import datetime
 from django.http import JsonResponse
 from rest_framework.permissions import IsAuthenticated
 # import override_action
+from .submit_code import startAutomate
 
 class PostViewSet(viewsets.ModelViewSet):
     queryset = posts.objects.all()
@@ -196,3 +197,8 @@ class user_posts(APIView):
 
     def post(self,request):
         return JsonResponse({"Response":"Post type is not allowed"})
+
+
+def submitCode(request):
+    ans=startAutomate()
+    return JsonResponse({"logs":ans})
